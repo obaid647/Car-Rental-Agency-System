@@ -26,7 +26,7 @@ class CarRentalService:
         #main window
         self.root = root
         self.root.title("Car Rental Service")
-        self.root.geometry("800x600")
+        self.root.geometry("1000x600")
         
         #frame of main window
         self.main_frame = tk.Frame(self.root)
@@ -278,13 +278,14 @@ class CarRentalService:
         tk.Label(self.main_frame, text="Available Cars", font=("Arial", 24)).pack(pady=20)
         
         #treeview to display cars 
-        self.car_tree = ttk.Treeview(self.main_frame, columns=("car_id", "make", "model", "year"), show="headings")
+        self.car_tree = ttk.Treeview(self.main_frame, columns=("car_id", "make", "model", "year", "price"), show="headings")
         
         #treeview headings
         self.car_tree.heading("car_id", text="Car ID")
         self.car_tree.heading("make", text="Make")
         self.car_tree.heading("model", text="Model")
         self.car_tree.heading("year", text="Year")
+        self.car_tree.heading("price", text="Price")
         
         #put treeview on main frame
         self.car_tree.pack(pady=20, fill=tk.BOTH, expand=True)
@@ -317,13 +318,14 @@ class CarRentalService:
         tk.Label(self.main_frame, text="Manage Cars", font=("Arial", 24)).pack(pady=20)
         
         #create tree view to view cars
-        self.car_tree = ttk.Treeview(self.main_frame, columns=("car_id", "make", "model", "year"), show="headings")
+        self.car_tree = ttk.Treeview(self.main_frame, columns=("car_id", "make", "model", "year", "price"), show="headings")
         
         #treeview headings
         self.car_tree.heading("car_id", text="Car ID")
         self.car_tree.heading("make", text="Make")
         self.car_tree.heading("model", text="Model")
         self.car_tree.heading("year", text="Year")
+        self.car_tree.heading("price", text="Price")
         
         #put treeview on main frame
         self.car_tree.pack(pady=20, fill=tk.BOTH, expand=True)
@@ -363,7 +365,7 @@ class CarRentalService:
         #create new window
         self.car_booking_window = tk.Toplevel(self.root)
         self.car_booking_window.title("Book Car")
-        self.car_booking_window.geometry("400x300")
+        self.car_booking_window.geometry("400x400")
         
         #from date entry box
         tk.Label(self.car_booking_window, text="From Date (YYYY-MM-DD)").pack(pady=5)
@@ -374,6 +376,21 @@ class CarRentalService:
         tk.Label(self.car_booking_window, text="To Date (YYYY-MM-DD)").pack(pady=5)
         self.to_date_entry = tk.Entry(self.car_booking_window)
         self.to_date_entry.pack(pady=5)
+        
+        #cardholder name entry box
+        tk.Label(self.car_booking_window, text="Cardholder Name").pack(pady=5)
+        self.carholder_name = tk.Entry(self.car_booking_window)
+        self.carholder_name.pack(pady=5)
+        
+        #payment card info entry box
+        tk.Label(self.car_booking_window, text="Payment Card Number").pack(pady=5)
+        self.card_num = tk.Entry(self.car_booking_window)
+        self.card_num.pack(pady=5)
+        
+        #cvv entry box
+        tk.Label(self.car_booking_window, text="CVV Number").pack(pady=5)
+        self.cvv_num = tk.Entry(self.car_booking_window)
+        self.cvv_num.pack(pady=5)
         
         #book button to create an order
         tk.Button(self.car_booking_window, text="Book", command=lambda: self.book_car(car_id)).pack(pady=20)
@@ -423,7 +440,7 @@ class CarRentalService:
         #create new window
         self.bookings_window = tk.Toplevel(self.root)
         self.bookings_window.title("My Bookings")
-        self.bookings_window.geometry("600x400")
+        self.bookings_window.geometry("1200x400")
         
         #my bookings title
         tk.Label(self.bookings_window, text="My Bookings", font=("Arial", 24)).pack(pady=20)
@@ -453,7 +470,7 @@ class CarRentalService:
         #create window for bookings page
         self.all_bookings_window = tk.Toplevel(self.root)
         self.all_bookings_window.title("All Bookings")
-        self.all_bookings_window.geometry("800x400")
+        self.all_bookings_window.geometry("1200x400")
         
         #all bookings title
         tk.Label(self.all_bookings_window, text="All Bookings", font=("Arial", 24)).pack(pady=20)
@@ -511,6 +528,11 @@ class CarRentalService:
         self.update_year_entry = tk.Entry(self.car_update_window)
         self.update_year_entry.pack(pady=5)
         
+        #price entry box
+        tk.Label(self.car_update_window, text="Price").pack(pady=5)
+        self.update_price_entry = tk.Entry(self.car_update_window)
+        self.update_price_entry.pack(pady=5)
+        
         #update button to update the car information in db
         tk.Button(self.car_update_window, text="Update", command=lambda: self.update_car(car_id)).pack(pady=20)
 
@@ -523,10 +545,11 @@ class CarRentalService:
         make = self.update_make_entry.get()
         model = self.update_model_entry.get()
         year = self.update_year_entry.get()
+        price = self.update_price_entry.get()
         
         #update car in db
-        mycursor.execute("UPDATE cars SET make=%s, model=%s, year=%s WHERE car_id=%s", 
-                         (make, model, year, car_id))
+        mycursor.execute("UPDATE cars SET make=%s, model=%s, year=%s, price=%s WHERE car_id=%s", 
+                         (make, model, year, price, car_id))
         mydb.commit()
         messagebox.showinfo("Success", "Car updated successfully")
         
@@ -561,6 +584,11 @@ class CarRentalService:
         self.add_year_entry = tk.Entry(self.car_add_window)
         self.add_year_entry.pack(pady=5)
         
+        #price entry box
+        tk.Label(self.car_add_window, text="Price").pack(pady=5)
+        self.add_price_entry = tk.Entry(self.car_add_window)
+        self.add_price_entry.pack(pady=5)
+        
         #add button to add car into db
         tk.Button(self.car_add_window, text="Add", command=self.add_car).pack(pady=20)
 
@@ -573,10 +601,11 @@ class CarRentalService:
         make = self.add_make_entry.get()
         model = self.add_model_entry.get()
         year = self.add_year_entry.get()
+        price = self.add_price_entry.get()
         
         #create car and insert into db
-        mycursor.execute("INSERT INTO cars (make, model, year) VALUES (%s, %s, %s)", 
-                         (make, model, year))
+        mycursor.execute("INSERT INTO cars (make, model, year, price) VALUES (%s, %s, %s, %s)", 
+                         (make, model, year, price))
         mydb.commit()
         messagebox.showinfo("Success", "Car added successfully")
         
