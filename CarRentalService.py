@@ -470,7 +470,7 @@ class CarRentalService:
         #create window for bookings page
         self.all_bookings_window = tk.Toplevel(self.root)
         self.all_bookings_window.title("All Bookings")
-        self.all_bookings_window.geometry("1200x400")
+        self.all_bookings_window.geometry("1200x500")
         
         #all bookings title
         tk.Label(self.all_bookings_window, text="All Bookings", font=("Arial", 24)).pack(pady=20)
@@ -489,8 +489,34 @@ class CarRentalService:
         #put tree view on window
         self.all_bookings_tree.pack(pady=20, fill=tk.BOTH, expand=True)
         
+        #put entry for customerID on window
+        tk.Label(self.all_bookings_window, text="Customer ID").pack(pady=5)
+        self.customerID_entry = tk.Entry(self.all_bookings_window)
+        self.customerID_entry.pack()
+        
+        #button to send email to late user
+        tk.Button(self.all_bookings_window, text="Email User", command=self.email_user).pack(pady=20)
+        
         #load order information onto treeview
         self.load_all_bookings()
+    
+    """
+    After clicking email user button, send email to user
+    """
+    def email_user(self):
+        
+        #get email using customer ID
+        customer_id = self.customerID_entry.get()
+        mycursor.execute("SELECT email FROM customers WHERE customer_id=%s;", (customer_id,))
+        email = mycursor.fetchone()
+        
+        #email found
+        if email:
+            messagebox.showinfo("Success","Successfully sent email to customer")
+        
+        #email not found
+        else:
+            messagebox.showerror("Error","Customer email not found")
 
     """
     After update car button is selected on admin main page. Open new window for entries of car information
@@ -648,6 +674,9 @@ class CarRentalService:
             
             #delete order
             self.bookings_tree.delete(i)
+            
+        #change status if order is late
+        mycursor.execute("UPDATE orders SET status = 'Late' WHERE to_date < CURDATE() AND status = 'Booked'")
         
         #retrieve all orders where order customerID is equal to userID
         mycursor.execute("SELECT c.make, c.model, c.year, o.from_date, o.to_date, o.status FROM orders o JOIN cars c ON o.car_id=c.car_id WHERE o.customer_id=%s", 
@@ -672,6 +701,9 @@ class CarRentalService:
             
             #delete booking
             self.all_bookings_tree.delete(i)
+            
+        #change status if order is late
+        mycursor.execute("UPDATE orders SET status = 'Late' WHERE to_date < CURDATE() AND status = 'Booked'")
         
         #retrieve all orders
         mycursor.execute("SELECT * FROM orders")
